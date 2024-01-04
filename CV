@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+	<link rel="stylesheet" href="styles.css" />
+    <title>CV</title>
+	<meta charset="utf-8" lang/>
+	</head>
+<body>
+<header>
+	<div class="text3d-wrap-3">
+		<article id="part0"><h1><span>Filimonenko Vladislav</span></h1></article>
+	</div>
+
+
+ </header>
+	<nav>
+	   <div class="topnav">
+		 <a href="#part1">Profile</a>
+		 <a href="#part2">Education</a>
+		 <a href="#part3">Skills</a>
+		 <a href="#part4">Languages</a>
+		 <a href="#part5">Contacts</a>
+	   </div>
+	</nav>
+
+		<div class="section">
+			<img src="foto.jpg" alt="img2">
+			<hr>
+			<article id="part1"><h2>Profile</h2></article>
+				<p>I am keen to follow a career in IT sphere. I am highly motivated and have good communication skills also I’m responsible and outgoing. In university I worked on a project related to security and development of local computer networks and servers.</p>
+			<article id="part2"><h2>Education</h2></article>
+				<p>2023-2025 Sukhoi State Technical university of Gomel. Programmer Engineer</p>
+				<p>2020-2024 Belarussian State University of Transport, electrotechnical faculty. Electrical Engineer</p>
+				<p>2009-2020 Gymnasium №58 named after F. P. Gaaz, Gomel</p>
+				<br><br>
+			<article id="part3"><h2>Skills</h2></article>
+				<p>Proven ability to work under pressure as a member of team, good communication skills</p>
+					<h3>Programming on:</h3>
+					<ul>
+						  <li>Java</li>
+						  <li>C</li>
+						  <li>C++</li>
+						  <li>C#</li>
+						  <li>HDL</li>
+					</ul>
+				<br><br>
+				<article id="part4"><h2>Languages</h2></article>
+					<ul>
+						  <li>Russian (mother tongue)</li>
+						  <li>Belarussian (mother tongue)</li>
+						  <li>English (intermediate)</li>
+					</ul>
+				<br><br>
+				<h2>Personal details</h2>
+				<p>Belarusian nationality. Age 20. Single. Full clean driving license.</p>
+				<br><br><hr>
+				<article id="part5"><h2>Contacts</h2></article>
+				<address>
+				34 October avenue<br>
+				246046 Gomel Belarus<br>
+				Tel: +375 44 587 20 07<br>
+				E-mail:
+				<a href="mailto:filruhub@gmail.com">filruhub@gmail.com</a>
+				</address>
+				<br><br><br><br><br><br>
+			
+		</div>
+	<aside class="CV">
+		<h2>My projects</h2>
+		<ul class="projects">
+			  <li><a href="C.html" target="blank">C</a></li>
+			  <li><a href="CSharp.html" target="blank">C#</a></li>
+			  <li><a href="HDL.html" target="blank">HDL</a></li>
+			  <li><a href="STM32.html" target="blank">STM32</a></li>
+		</ul>
+	</aside>
+
+
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<footer>
+	   <div class="topnav">
+		 <a href="#part0">^UP^</a>
+	   </div>
+	</footer>
+	</body>
+</html>
