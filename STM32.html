@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+	<link rel="stylesheet" href="styles.css" />
+    <title>STM32</title>
+	<meta charset="utf-8" lang/>
+	</head>
+	<body>
+<header>
+	<div class="text3d-wrap-3">
+		<article id="part0"><h1><span>STM32</span></h1></article>
+	</div>
+ </header>
+	
+
+		<div class="section">
+			<hr>
+			<pre>
+#include "stm32f051x8.h"
+void Digit9(void); //включаем соответствующую цифру
+void Digit8(void);
+void Digit7(void);
+void Digit6(void);
+void Digit5(void);
+void Digit4(void);
+void Digit3(void);
+void Digit2(void);
+void Digit1(void);
+void Digit0(void);
+void TIM6_DAC_IRQHandler(void); // функция при срабатывании таймера
+void SelSeg(uint16_t numSeg); // выбор разряда сегмента
+void SelDig(uint16_t numDig); // функция для выбора цифры на одном сегменте
+
+uint16_t a = 0;
+uint16_t b = 0;
+
+int main(void) {
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN; //первой строчкой настраиваем тактирование на
+порте для работы с разрядами
+	GPIOC->MODER |= GPIO_MODER_MODER6_0;//пины настраиваем на выыод
+	GPIOC->MODER |= GPIO_MODER_MODER7_0;
+	GPIOC->MODER |= GPIO_MODER_MODER8_0;
+	GPIOC->MODER |= GPIO_MODER_MODER9_0;
+	
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	GPIOA->MODER |= GPIO_MODER_MODER7_0;//g название сегмента
+	GPIOA->MODER |= GPIO_MODER_MODER2_0;//b
+	GPIOA->MODER |= GPIO_MODER_MODER1_0;//a
+	GPIOA->MODER |= GPIO_MODER_MODER6_0;//f
+	GPIOA->MODER |= GPIO_MODER_MODER5_0;//e
+	GPIOA->MODER |= GPIO_MODER_MODER4_0;//d
+	GPIOA->MODER |= GPIO_MODER_MODER3_0;//c
+	
+	GPIOC->BSRR |= GPIO_BSRR_BR_6; //выключаем разряды
+	GPIOC->BSRR |= GPIO_BSRR_BR_7;
+	GPIOC->BSRR |= GPIO_BSRR_BR_8;
+	GPIOC->BSRR |= GPIO_BSRR_BR_9;
+	
+	RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;//тактирование таймера
+	TIM6->PSC=7999; //настрйока прескелера
+	TIM6->ARR=1000; //регистр автоперезагрузки (каждые 1000 милисекунд...)
+	TIM6->DIER |= TIM_DIER_UIE; //прерывание при перезагрузке или переполнении
+	TIM6->CR1 |= TIM_CR1_OPM;
+	NVIC_SetPriority(TIM6_DAC_IRQn, 2);// устанавливаем приоритет прерывания при
+	срабатывании таймера
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	TIM6->CR1 |= TIM_CR1_CEN;//включение таймера
+}
+
+void Digit9(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1; // установка бита и включение пина 9
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BS_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit8(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BR_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BR_6;
+	GPIOA->BSRR |= GPIO_BSRR_BR_7;
+}
+
+void Digit7(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BR_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BS_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit1(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BS_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BR_7;
+}
+
+void Digit6(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BR_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit5(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BR_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BR_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit4(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BR_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit3(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BR_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BS_5;
+	GPIOA->BSRR |= GPIO_BSRR_BR_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void Digit2(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BR_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BR_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BR_6;
+	GPIOA->BSRR |= GPIO_BSRR_BR_7;
+}
+
+void Digit0(void)
+{
+	GPIOA->BSRR |= GPIO_BSRR_BS_1;
+	GPIOA->BSRR |= GPIO_BSRR_BS_2;
+	GPIOA->BSRR |= GPIO_BSRR_BS_3;
+	GPIOA->BSRR |= GPIO_BSRR_BS_4;
+	GPIOA->BSRR |= GPIO_BSRR_BR_5;
+	GPIOA->BSRR |= GPIO_BSRR_BS_6;
+	GPIOA->BSRR |= GPIO_BSRR_BS_7;
+}
+
+void SelSeg(uint16_t numSeg){ // выборка разряда
+	switch(numSeg){
+	case 0: GPIOC->BSRR |= GPIO_BSRR_BR_6;
+			GPIOC->BSRR |= GPIO_BSRR_BS_7;
+			GPIOC->BSRR |= GPIO_BSRR_BS_8;
+			GPIOC->BSRR |= GPIO_BSRR_BS_9;
+		break;
+	case 1: GPIOC->BSRR |= GPIO_BSRR_BS_6;
+			GPIOC->BSRR |= GPIO_BSRR_BR_7;
+			GPIOC->BSRR |= GPIO_BSRR_BS_8;
+			GPIOC->BSRR |= GPIO_BSRR_BS_9;
+		break;
+	case 2: GPIOC->BSRR |= GPIO_BSRR_BS_6;
+			GPIOC->BSRR |= GPIO_BSRR_BS_7;
+			GPIOC->BSRR |= GPIO_BSRR_BR_8;
+			GPIOC->BSRR |= GPIO_BSRR_BS_9;
+	case 3: GPIOC->BSRR |= GPIO_BSRR_BS_6;
+			GPIOC->BSRR |= GPIO_BSRR_BS_7;
+			GPIOC->BSRR |= GPIO_BSRR_BS_8;
+			GPIOC->BSRR |= GPIO_BSRR_BR_9;
+		break;
+	}
+	b++;
+	if(b>3)
+		b = 0;
+}
+
+void SelDig(uint16_t numDig){ // динамическая индекация
+	switch(numDig){
+	case 0: Digit1();
+	break;
+	case 1: Digit2();
+	break;
+	case 2: Digit3();
+	break;
+	case 3: Digit4();
+	break;
+	case 4: Digit5();
+	break;
+	case 5: Digit6();
+	break;
+	case 6: Digit7();
+	break;
+	case 7: Digit8();
+	break;
+	case 8: Digit9();
+	break;
+	case 9: Digit0(); // включаемая цифра
+	break;
+	default: break;
+	}
+	a++;
+	if(a>9)
+		a = 0;
+}
+
+void TIM6_DAC_IRQHandler(void){
+	if(TIM6->SR & TIM_SR_UIF){
+		SelSeg(b); // включаем
+		SelDig(a); // выключаем цифру
+		TIM6->SR &= ~TIM_SR_UIF;
+		TIM6->CR1 |= TIM_CR1_CEN;
+	}
+}
+
+				</pre>
+				<br><br><br><br><br><br><br><br>
+			
+		</div>
+	<aside class="STM32">
+		
+	</aside>
+
+
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<footer>
+	   <div class="topnav">
+		 <a href="#part0">UP</a>
+	   </div>
+	</footer>
+
+	</body>
+</html>

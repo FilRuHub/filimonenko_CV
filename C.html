@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+	<link rel="stylesheet" href="styles.css" />
+    <title>C</title>
+	<meta charset="utf-8" lang/>
+	</head>
+	<body>
+<header>
+	<div class="text3d-wrap-3">
+		<article id="part0"><h1><span>C</span></h1></article>
+	</div>
+ </header>
+	
+
+		<div class="section">
+			<hr>
+			<article id="head"><h2>head.h</h2></article>
+				<pre>
+#include &lt;stdio.h>
+#include &lt;locale.h>
+#include &lt;string.h>
+#include &lt;ctype.h>
+#include &lt;Windows.h>
+
+#define MAX_KR 50 
+
+struct myStruct 
+{  
+	char Name[38];
+	char Country[12];  
+	int Frz;  
+	int Tmax;  
+	char Type[20]; 
+};
+
+void ClearBuffer(void);
+void Input(char*, struct myStruct*, int*);
+void Output(char*, struct myStruct*, int*);
+void Save(char*, struct myStruct*, int*);
+void Open(char*, struct myStruct*, int*, int);
+void AddEnd(char*, int*);
+void DellEnd(char*, struct myStruct*, int*);
+void AddItem(char*, int*);
+void DelItem(char*, int*);
+void UpdateItem(char*, struct myStruct*, int*);
+void Find(char*, struct myStruct*, int*);
+void FindText1(char*, struct myStruct*, int*);
+void SortBubble(char*, struct myStruct*, int*);
+void SortChoice(char*, struct myStruct*, int*);
+void vstavka(char*, struct myStruct*, int*);
+void SortShell(char*, struct myStruct*, int*);
+void FastSortMenu(char*, struct myStruct*, int*);
+void FastSort1(char*, struct myStruct*, int*, int, int);
+void FastSort2(char*, struct myStruct*, int*, int, int);
+				</pre>
+			<article id="main"><h2>main.c</h2></article>
+				<pre>
+#include "head.h"
+
+
+int main(int argc, char * argv[])
+{
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	setlocale(LC_ALL, "RU");
+	int Count = 0;
+	char Result;
+	char FileName[24];
+	struct myStruct KR[MAX_KR];
+	if(argc == 1)
+	{
+		printf("Укажите название файла с базой данных: ");
+		scanf("%s", FileName);
+		ClearBuffer();
+		Open(FileName, KR, &Count, 2);
+	}
+	else 
+	{
+		strcpy(FileName, argv[1]);
+		Open(FileName, KR, &Count, 2);
+	}
+	while (1)
+	{
+		printf("а. Создание справочника данных\n");
+		printf("б. Вывод данных справочника на экран\n");
+		printf("в. Добавление данных в конец справочника\n");
+		printf("г. Удаление данных в конце справочника\n");
+		printf("д. Добавление данных после записи с указанным номером\n");
+		printf("е. Удаление данных с указанным номером\n");
+		printf("ж. Корректировка данных с указанным номером\n");
+		printf("з. Поиск данных по определенному числовому полю\n");
+		printf("и. Поиск данных по определенному текстовому полю\n");
+		printf("к. Сортировка методом пузырька по полю Наименование строкового типа\n");
+		printf("л. Сортировка методом выбора по числовому полю Напряжение\n");
+		printf("м. Сортировка методом вставок по полю Выход строкового типа\n");
+		printf("н. Сортировка методом Шелла по числовому полю Tmax\n");
+		printf("о. Сортировка методом быстрой сортировки по полю Серии в аналогичном корпусе строкового типа\n");
+		printf("п. Сохранение справочника в файл\n");
+		printf("р. Открытие справочника из файла\n");
+		printf("с. Выход из программы\n");
+		printf("Выберите пункт меню: ");
+		scanf("%c", &Result);
+		ClearBuffer();
+		switch (Result)
+		{
+			case 'а':
+			{
+				Input(FileName, KR, &Count);
+				break;
+			}
+			case 'б':
+			{
+				Output(FileName, KR, &Count);
+				break;
+			}
+			case 'в':
+			{
+				AddEnd(FileName, &Count);
+				break;
+			}
+			case 'г':
+			{
+				DellEnd(FileName, KR, &Count);
+				break;
+			}
+			case 'д':
+			{
+				AddItem(FileName, &Count);
+				break;
+			}
+			case 'е':
+			{
+				DelItem(FileName, &Count);
+				break;
+			}
+			case 'ж':
+			{
+				UpdateItem(FileName, KR, &Count);
+				break;
+			}
+			case 'з':
+			{
+				Find(FileName, KR, &Count);
+				break;
+			}
+			case 'и':
+			{
+				FindText1(FileName, KR, &Count);
+				break;
+			}
+			case 'к':
+			{
+				SortBubble(FileName, KR, &Count);
+				break;
+			}
+			case 'л':
+			{
+				SortChoice(FileName, KR, &Count);
+				break;
+			}
+			case 'м':
+			{
+				vstavka(FileName, KR, &Count);
+				break;
+			}
+			case 'н':
+			{
+				SortShell(FileName, KR, &Count);
+				break;
+			}
+			case 'о':
+			{
+				FastSortMenu(FileName, KR, &Count);
+				break;
+			}
+			case 'п':
+			{
+				printf("Укажите название файла с базой данных: ");
+				scanf("%s", FileName);
+				ClearBuffer();
+				Save(FileName, KR, &Count);
+				break;
+			}
+			case 'р':
+			{
+				printf("Укажите название файла с базой данных: ");
+				scanf("%s", FileName);
+				ClearBuffer();
+				Open(FileName, KR, &Count, 2);
+				break;
+			}
+			case 'с': return 0;
+			default:
+			{
+				printf("Такого пункта не существует, попробуйте заново!\n");
+				break;
+			}
+		}
+	}
+	return 0;
+}
+
+				</pre>
+				<br><br><hr>
+			<article id="input"><h2>input.c</h2></article>
+				<pre>
+#include "head.h"
+
+void ClearBuffer(void)
+{
+	while(getchar() != '\n') continue;
+	return ;
+}
+
+void Input(char *FileName, struct myStruct *KR, int *Count)
+{
+	int i, j;
+	Open(FileName, KR, Count, 0);
+	if((*Count) > 0)
+	{
+		while(1)
+		{
+			printf("У вас уже имеется заполненный справочник! Вы уверены что хотите перезаписать его? (1 - Очистить справочник, 2 - Продолжить справочник): )");
+			while(scanf("%d", &i) != 1)
+			{
+				printf("Вводимое число должно быть целочисленным!\n");
+				ClearBuffer();
+				continue;
+			}
+			ClearBuffer();
+			if(i == 1)
+			{
+				(*Count) = 0;
+				break;
+			}
+			else if(i == 2){ break; }
+			else
+			{
+				printf("Вводимое число не может быть меньше 1 и больше 2!\n");
+				continue;
+			}
+		}
+	}
+	if((*Count) >= MAX_KR)
+	{
+		printf("Справочник полностью заполнен!\n");
+		return ;
+	}
+	for(; (*Count) &lt; MAX_KR; (*Count)++)
+	{
+		printf("Введите название кварцевого резонатора номер %d: ", (*Count) + 1);
+		scanf("%s", KR[(*Count)].Name);
+		ClearBuffer();
+		printf("Введите Выход: ");
+		scanf("%s", KR[(*Count)].Country);
+		ClearBuffer();
+		while(1)
+		{
+			printf("Введите Напряжение: ");
+			while(scanf("%d", &KR[(*Count)].Frz) != 1)
+			{
+				printf("Некорректное значение!\n");
+				ClearBuffer();
+				continue;
+			}
+			ClearBuffer();
+			if(KR[(*Count)].Frz > 0) break;
+			else printf("Вводимое значение должно быть больше 0!\n\n");
+		}
+		while(1)
+		{
+			printf("Введите значение максимально допустимой рабочей температуры Tmax: ");
+			while(scanf("%d", &KR[(*Count)].Tmax) != 1)
+			{
+				printf("Некорректное значение!\n");
+				ClearBuffer();
+				continue;
+			}
+			ClearBuffer();
+			if(KR[(*Count)].Tmax > 0) break;
+			else printf("Вводимое значение должно быть больше 0!\n\n");
+		}
+		printf("Введите Серию в аналогичном корпусе: ");
+		scanf("%s", KR[(*Count)].Type);
+		while(1)
+		{
+			printf("Закончить ввод?(1 - Да / 2 - Нет): ");
+			while(scanf("%d", &j) != 1)
+			{
+				printf("Некорректный ввод!\n");
+				ClearBuffer();
+				continue;
+			}
+			ClearBuffer();
+			if(j == 1)
+			{
+				(*Count)++;
+				Save(FileName, KR, Count);
+				break;
+			}
+			else if(j == 2)
+			{
+				break;
+			}
+			else printf("Вводимое значение должно быть от 1 до 2!\n");
+		}
+		if(j == 1) break;
+	}
+	return ;
+
+}
+				</pre>
+				<br><br><hr>
+				<article id="output"><h2>output.c</h2></article>
+				<pre>
+#include "head.h"
+
+void Output(char *FileName, struct myStruct * KR, int * Count)
+{
+	Open(FileName, KR, Count, 0);
+	printf("|=================================================================================|\n");
+	printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серии в аналогичном корпусе |\n");
+	for(int i = 0; i != (*Count); i++)
+	{
+		printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i+1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+	}
+	printf("|=================================================================================|\n");
+	return ;
+}
+				</pre>
+				<br><br>
+				<article id="addend"><h2>addend.c</h2></article>
+				<pre>
+#include "head.h"
+
+void AddEnd(char * FileName, int *Count)
+{
+	int result, Frz = (*Count);
+	FILE *out;
+	struct myStruct KR;
+	if((out = fopen(FileName, "r+")) == NULL)
+	{ 
+        printf("Невозможно открыть файл для записи\n"); 
+        return ; 
+    }
+	if(*Count == MAX_KR)
+	{
+		printf("Внимание Список полностью заполнен! Последний элемент будет заменен!\nПродолжить ? (1 - Да, 2 - Нет): ");
+		scanf("%d", &result);
+		ClearBuffer();
+		if(result == 1){ }
+		else
+		{
+			return ;
+		}
+	}
+	printf("Введите название кварцевого резонатора номер %d: ", (*Count) + 1);
+	scanf("%s", KR.Name);
+	ClearBuffer();
+	printf("Введите выход: ");
+	scanf("%s", KR.Country);
+	ClearBuffer();
+	while(1)
+	{
+		printf("Введите Напряжение: ");
+		while(scanf("%d", &KR.Frz) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(KR.Frz > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	while(1)
+	{
+		printf("Введите значение максимально допустимой рабочей температуры Tmax: ");
+		while(scanf("%d", &KR.Tmax) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(KR.Tmax > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	printf("Введите Серию в аналогичном корпусе: ");
+	scanf("%s", KR.Type);
+	ClearBuffer();
+	if(Frz != MAX_KR) (*Count)++;
+	rewind(out);
+	fprintf(out, "%d\n", *Count);
+	fseek(out, 0, SEEK_END);
+	fprintf(out, "%s %s %d %d %s\n", KR.Name, KR.Country, KR.Frz, KR.Tmax, KR.Type);
+	fclose(out);
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="additem"><h2>additem.c</h2></article>
+				<pre>
+#include "head.h"
+
+void AddItem(char * FileName, int *Count)
+{
+	int result, i = (*Count);
+	struct myStruct KR, Temp;
+	FILE *in, *out;
+	char ch;
+ 	if(( in = fopen(FileName, "r")) == NULL)
+    {
+		printf("Файл для чтения не найден");
+    	return ;
+    }    
+    if(( out = fopen("test1", "w+")) == NULL)
+    {
+        printf("Невозможно создать файл для записи");
+        return ;
+    }
+	fscanf(in, "%d", Count);
+	fprintf(out, "%d\n", (*Count)+1);
+	if(*Count == MAX_KR)
+	{
+		while(1)
+		{
+			printf("Внимание Список полностью заполнен! Последний элемент будет заменен!\nПродолжить ? (1 - Да, 2 - Нет): ");
+			while(scanf("%d", &result) != 1)
+			{
+				printf("Некорректный ввод!\n");
+				ClearBuffer();
+				continue;
+			}
+			ClearBuffer();
+			if(result == 1)break;
+			else
+			{
+				return ;
+			}
+		}
+	}
+	while(1)
+	{
+		printf("Введите номер элемента после которого хотите вставить запись: ");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(result > 0 && result &lt; MAX_KR) break;
+	}
+	printf("Введите название кварцевого резонатора номер %d: ", result + 1);
+	scanf("%s", KR.Name);
+	ClearBuffer();
+	printf("Введите выход: ");
+	scanf("%s", KR.Country);
+	ClearBuffer();
+	while (1)
+	{
+		printf("Введите Напряжение: ");
+		while (scanf("%d", &KR.Frz) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if (KR.Frz > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	while (1)
+	{
+		printf("Введите значение максимально допустимой рабочей температуры Tmax: ");
+		while (scanf("%d", &KR.Tmax) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if (KR.Tmax > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	printf("Введите серию в аналогичном корпусе: ");
+	scanf("%s", KR.Type);
+	ClearBuffer();
+	for(i = 0; i != (*Count); i++)
+	{
+		fscanf(in, "%s%s%d%d%s", Temp.Name, Temp.Country, &Temp.Frz, &Temp.Tmax, Temp.Type);
+		fprintf(out, "%s %s %d %d %s\n", Temp.Name, Temp.Country, Temp.Frz, Temp.Tmax, Temp.Type);
+		if(i == result-1)
+		{ 
+			fseek(out, 0, SEEK_END);
+			fprintf(out, "%s %s %d %d %s\n", KR.Name, KR.Country, KR.Frz, KR.Tmax, KR.Type);
+		}
+    }
+    fclose(in);
+    fclose(out);
+	
+	if(( in = fopen(FileName, "w+")) == NULL)
+    {
+		printf("Файл для чтения не найден");
+    	return ;
+    }    
+    if(( out = fopen("test1", "r")) == NULL)
+    {
+        printf("Невозможно создать файл для записи");
+        return ;
+    }
+    while(!feof(out))
+    {
+        ch=getc(out);
+    	if(!feof(out)) putc(ch, in);       
+    }
+    fclose(in);
+    fclose(out);
+	remove("test1");
+	(*Count)++;
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="delitem"><h2>delitem.c</h2></article>
+				<pre>
+#include "head.h"
+
+void DelItem(char * FileName, int *Count)
+{
+	FILE *in, *out;
+    struct myStruct KR;
+	int i = 0, result;
+	char ch;
+    if(( in = fopen(FileName, "r")) == NULL)
+    {
+		printf("Файл для чтения не найден");
+    	return ;
+    }    
+    if(( out = fopen("test1", "w+")) == NULL)
+    {
+        printf("Невозможно создать файл для записи");
+        return ;
+    }
+	while(1)
+	{
+		printf("Введите номер элемента который хотите удалить: ");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(result > 0 && result &lt;= (*Count)) break;
+	}
+    while(!feof(in))
+    {
+		if(i == 0) fscanf(in, "%d", Count);
+		if(*Count == 0)
+		{
+			printf("Справочник пуст!\n");
+			fclose(in);
+		    fclose(out);
+			return ;
+		}
+		fscanf(in, "%s%s%d%d%s", KR.Name, KR.Country, &KR.Frz, &KR.Tmax, KR.Type);
+		if(!feof(in))
+		{
+			if(i == 0) fprintf(out, "%d\n", *Count);
+			if(i == result-1){ }
+			else fprintf(out, "%s %s %d %d %s\n", KR.Name, KR.Country, KR.Frz, KR.Tmax, KR.Type);
+			i++;
+		}
+    }
+	(*Count)--;
+	rewind(out);
+	fprintf(out, "%d\n", *Count);
+    fclose(in);
+    fclose(out);
+	
+	if(( in = fopen(FileName, "w+")) == NULL)
+    {
+		printf("Файл для чтения не найден");
+    	return ;
+    }    
+    if(( out = fopen("test1", "r")) == NULL)
+    {
+        printf("Невозможно создать файл для записи");
+        return ;
+    }
+    while(!feof(out))
+    {
+        ch=getc(out);
+    	if(!feof(out)) putc(ch, in);       
+    }
+    fclose(in);
+    fclose(out);
+	remove("test1");
+	printf("Запись номер %d успешно удалена из справочника\n", result);
+	return ;
+}
+				</pre>
+				<br><br><hr>
+				<article id="dellend"><h2>dellend.c</h2></article>
+				<pre>
+#include "head.h"
+
+void DellEnd(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	(*Count)--;
+	Save(FileName, KR, Count);
+	printf("Запись номер %d успешно удалена\n", (*Count)+1);
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="fastsort"><h2>fastsort.c</h2></article>
+				<pre>
+#include "head.h"
+
+void FastSortMenu(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result;
+	while(1)
+	{
+		printf("Выберите тип сортировки:\n1 - По возрастанию\n2 - По убыванию\n3 - Назад\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				FastSort1(FileName, KR, Count, 0, *Count-1);
+				break;
+			}
+			case 2:
+			{
+				FastSort2(FileName, KR, Count, 0, *Count-1);
+				break;
+			}
+			case 3: { return; }
+		}
+	}
+	return ;
+}
+
+void FastSort1(char * FileName, struct myStruct * Usil, int *Count, int first, int last)
+{
+	Open(FileName, Usil, Count, 0);
+	if (first &lt; last)
+    {
+        int left = first, right = last;
+		struct myStruct middle = Usil[(left + right) / 2];
+        do
+        {
+			while (strcmp(Usil[left].Type, middle.Type) &lt; 0) left++;
+            while (strcmp(Usil[right].Type, middle.Type) > 0) right--;
+            if (left &lt;= right)
+            {
+                struct myStruct tmp = Usil[left];
+				Usil[left] = Usil[right];
+				Usil[right] = tmp;
+                left++;
+                right--;
+				Save(FileName, Usil, Count);
+            }
+        } 
+		while (left &lt;= right);
+        FastSort1(FileName, Usil, Count, first, right);
+        FastSort1(FileName, Usil, Count, left, last);
+    }
+}
+
+void FastSort2(char * FileName, struct myStruct * Usil, int *Count, int first, int last)
+{
+	Open(FileName, Usil, Count, 0);
+	if (first &lt; last)
+    {
+        int left = first, right = last;
+		struct myStruct middle = Usil[(left + right) / 2];
+        do
+        {
+			while (strcmp(Usil[left].Type, middle.Type) > 0) left++;
+			while (strcmp(Usil[right].Type, middle.Type) &lt; 0) right--;
+            if (left &lt;= right)
+            {
+                struct myStruct tmp = Usil[left];
+				Usil[left] = Usil[right];
+				Usil[right] = tmp;
+                left++;
+                right--;
+				Save(FileName, Usil, Count);
+            }
+        } 
+		while (left &lt;= right);
+        FastSort2(FileName, Usil, Count, first, right);
+        FastSort2(FileName, Usil, Count, left, last);
+    }
+}
+				</pre>
+				<br><br><hr>
+				<article id="find"><h2>find.c</h2></article>
+				<pre>
+#include "head.h"
+
+void Find(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result = 0;
+	while(1)
+	{
+		printf("Выберите поле по которому будет поисходить поиск:\n");
+		printf("1) Поиск по полю Напряжение\n");
+		printf("2) Поиск по полю Tmax\n");
+		printf("3) Выход\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				int temp;
+				int count = 0;
+				printf("Введите значение по которому будет происходить поиск: ");
+				while(scanf("%d", &temp) != 1)
+				{
+					printf("Некорректный ввод!\n");
+					ClearBuffer();
+					continue;
+				}
+				ClearBuffer();
+				printf("Результат: \n");
+				printf("|=================================================================================|\n");
+				printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серия в аналогичном корпусе |\n");
+				for(int i = 0; i != *Count; i++)
+				{
+					if(KR[i].Frz == temp)
+					{
+						printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i+1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+						count++;
+					}
+				}
+				if(count == 0) printf("Данных с таким значением не найдено!\n");
+				printf("|=================================================================================|\n");
+				break;
+			}
+			case 2:
+			{
+				int temp;
+				int count = 0;
+				printf("Введите значение по которому будет происходить поиск: ");
+				while(scanf("%d", &temp) != 1)
+				{
+					printf("Некорректный ввод!\n");
+					ClearBuffer();
+					continue;
+				}
+				ClearBuffer();
+				printf("Результат: \n");
+				printf("|=================================================================================|\n");
+				printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серия в аналогичном корпусе |\n");
+				for(int i = 0; i != *Count; i++)
+				{
+					if(KR[i].Tmax == temp)
+					{
+						printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i+1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+						count++;
+					}
+				}
+				if(count == 0) printf("Данных с таким значением не найдено!\n");
+				printf("|=================================================================================|\n");
+				break;
+			}
+			case 3: { return ; }
+		}
+	}
+	return ;
+}
+				
+				</pre>
+				<br><br><hr>
+				<article id="find1"><h2>find1.c</h2></article>
+				<pre>
+#include "head.h"
+
+void FindText1(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result = 0;
+	while(1)
+	{
+		printf("Выберите поле по которому будет поисходить поиск:\n");
+		printf("1) Поиск по полю Наименование\n");
+		printf("2) Поиск по полю Выход\n");
+		printf("3) Поиск по полю Серия в аналогичном корпусе\n");
+		printf("4) Выход\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				char temp[24];
+				int count = 0;
+				printf("Введите значение по которому будет происходить поиск: ");
+				scanf("%s", temp);
+				ClearBuffer();
+				printf("Результат: \n");
+				printf("|=================================================================================|\n");
+				printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серию в аналогичном корпусе |\n");
+				for (int i = 0; i != *Count; i++)
+				{
+					if (!strcmp(temp, KR[i].Name))
+					{
+						printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i + 1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+						count++;
+					}
+				}
+				if (count == 0) printf("Данных с таким значением не найдено!\n");
+				printf("|================================================================================|\n");
+				break;
+			}
+			case 2:
+			{
+				char temp[24];
+				int count = 0;
+				printf("Введите значение по которому будет происходить поиск: ");
+				scanf("%s", temp);
+				ClearBuffer();
+				printf("Результат: \n");
+				printf("|=================================================================================|\n");
+				printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серия в аналогичном корпусе |\n");
+				for (int i = 0; i != *Count; i++)
+				{
+					if (!strcmp(temp, KR[i].Country))
+					{
+						printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i + 1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+						count++;
+					}
+				}
+				if (count == 0) printf("Данных с таким значением не найдено!\n");
+				printf("|=================================================================================|\n");
+				break;
+			}
+			case 3:
+			{
+				char temp[24];
+				int count = 0;
+				printf("Введите значение по которому будет происходить поиск: ");
+				scanf("%s", temp);
+				ClearBuffer();
+				printf("Результат: \n");
+				printf("|=================================================================================|\n");
+				printf("| Номер | Наименование | Выход | Напряжение | Tmax  | Серия в аналогичном корпусе |\n");
+				for (int i = 0; i != *Count; i++)
+				{
+					if (!strcmp(temp, KR[i].Type))
+					{
+						printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i + 1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+						count++;
+					}
+				}
+				if (count == 0) printf("Данных с таким значением не найдено!\n");
+				printf("|=================================================================================|\n");
+				break;
+			}
+			case 4: { return ; }
+		}
+	}
+	return ;
+}
+				
+				</pre>
+				<br><br><hr>
+				<article id="open"><h2>open.c</h2></article>
+				<pre>
+#include "head.h"
+
+void Open(char *FileName, struct myStruct *KR, int *Count, int status)
+{ 
+    FILE *in; 
+	int i = 0;
+    if((in = fopen(FileName, "r")) == NULL)
+	{ 
+        printf("Невозможно открыть файл для чтения\n"); 
+        return ; 
+    } 
+	fscanf(in, "%d", Count);
+	for(i = 0; i != (*Count); i++)
+	{
+		fscanf(in, "%s%s%d%d%s", KR[i].Name,  KR[i].Country,  &KR[i].Frz,  &KR[i].Tmax,  KR[i].Type);
+		if(status == 1) printf("|%7d|%14s|%7s|%12d|%7d|%29s|\n", i+1, KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+	}
+    fclose(in); 
+    if(status == 2) printf("Было считано %d записей\n", *Count); 
+    return ; 
+} 				
+				</pre>
+				<br><br><hr>
+				<article id="save"><h2>save.c</h2></article>
+				<pre>
+#include "head.h"
+
+void Save(char *FileName, struct myStruct *KR, int *Count)
+{ 
+    int res, i; 
+    FILE *out; 
+    if((out = fopen(FileName, "w")) == NULL)
+	{ 
+        printf("Невозможно открыть файл для записи\n"); 
+        return ; 
+    }
+	fprintf(out, "%d\n", *Count);
+	for(i = 0, res = 0; i != (*Count); i++)
+	{
+		fprintf(out, "%s %s %d %d %s\n", KR[i].Name, KR[i].Country, KR[i].Frz, KR[i].Tmax, KR[i].Type);
+		res++;
+  	}
+	rewind(out);
+	if(res != *Count)
+	{ 
+        printf("Не все записи были записаны в файл\n"); 
+        return ; 
+    } 
+    fclose(out); 
+    printf("Запись в файл успешно завершена\n"); 
+    return; 
+}				
+				</pre>
+				<br><br><hr>
+				<article id="sortbubble"><h2>sortbubble.c</h2></article>
+				<pre>
+#include "head.h"
+
+void SortBubble(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result, j;
+	while(1)
+	{
+		printf("Выберите тип сортировки:\n1 - По возрастанию\n2 - По убыванию\n3 - Назад\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				struct myStruct Temp; 
+				char c; 
+				do 
+				{ 
+				  	c = 0; 
+				  	for(j = 0; j &lt; (*Count)-1; j++) 
+					{ 
+						if(strcmp(KR[j].Name, KR[j+1].Name) > 0)
+						{ 
+					    	Temp = KR[j]; 
+					       	KR[j] = KR[j+1]; 
+					       	KR[j+1] = Temp; 
+					    	c = 1; 
+					   	} 
+				    } 
+				}
+				while(c); 
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 2:
+			{
+				struct myStruct Temp; 
+				char c; 
+				do 
+				{ 
+				  	c = 0; 
+				  	for(j = 0; j &lt; (*Count)-1; j++) 
+					{ 
+						if(strcmp(KR[j].Name, KR[j+1].Name) &lt; 0)
+						{ 
+					    	Temp = KR[j]; 
+					       	KR[j] = KR[j+1]; 
+					       	KR[j+1] = Temp; 
+					    	c = 1; 
+					   	} 
+				    } 
+				}
+				while(c); 
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 3:
+			{
+				return ;
+			}
+		}
+	}
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="sortchoice"><h2>sortchoice.c</h2></article>
+				<pre>
+#include "head.h"
+
+void SortChoice(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int i, n, max, result;
+	n = (*Count);
+	struct myStruct Temp; 
+	while(1)
+	{
+		printf("Выберите тип сортировки:\n1 - По возрастанию\n2 - По убыванию\n3 - Назад\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				for(; n > 1; n--) 
+				{ 
+					max = 0; 
+					for(i = 1; i &lt; n; i++)
+					{
+						if(KR[i].Frz > KR[max].Frz)
+						{
+						   max = i; 
+						}	
+					}
+					Temp = KR[n-1]; 
+					KR[n-1] = KR[max]; 
+					KR[max] = Temp; 
+				}
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 2:
+			{
+				for(; n > 1; n--) 
+				{ 
+					max = 0; 
+					for(i = 1; i &lt; n; i++)
+					{
+						if(KR[i].Frz &lt; KR[max].Frz)
+						{
+						   max = i; 
+						}	
+					}
+					Temp = KR[n-1]; 
+					KR[n-1] = KR[max]; 
+					KR[max] = Temp; 
+				}
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 3:
+			{
+				return ;
+			}
+		}
+	} 			
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="sortshell"><h2>sortshell.c</h2></article>
+				<pre>
+#include "head.h"
+
+void SortShell(char *FileName, struct myStruct * KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int i, j, k, result;
+	struct myStruct Temp; 
+	while(1)
+	{
+		printf("Выберите тип сортировки:\n1 - По возрастанию\n2 - По убыванию\n3 - Назад\n");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch(result)
+		{
+			case 1:
+			{
+				for(k = (*Count)/2; k > 0; k /=2)
+				{
+			        for(i = k; i &lt; (*Count); i++)
+			        {
+			            Temp = KR[i];
+			            for(j = i; j >= k; j -= k)
+			            {
+			                if(Temp.Tmax &lt; KR[j - k].Tmax)
+			                    KR[j] = KR[j - k];
+			                else
+			                    break;
+			            }
+			            KR[j] = Temp;
+			        }
+				}
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 2:
+			{
+				for(k = (*Count)/2; k > 0; k /=2)
+				{
+			        for(i = k; i &lt; (*Count); i++)
+			        {
+			            Temp = KR[i];
+			            for(j = i; j >= k; j -= k)
+			            {
+							if (Temp.Tmax > KR[j - k].Tmax)
+			                    KR[j] = KR[j - k];
+			                else
+			                    break;
+			            }
+			            KR[j] = Temp;
+			        }
+				}
+				Save(FileName, KR, Count);
+				break;
+			}
+			case 3:
+			{
+				return ;
+			}
+		}
+	}	
+	return ;
+}				
+				</pre>
+				<br><br><hr>
+				<article id="updateitem"><h2>updateitem.c</h2></article>
+				<pre>
+#include "head.h"
+
+void UpdateItem(char *FileName, struct myStruct *KR, int *Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result, i = (*Count);
+	while(1)
+	{
+		printf("Введите номер элемента который хотите изменить: ");
+		while(scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(result > 0 && result &lt;= (*Count)) break;
+	}
+	i = result-1;
+	printf("Введите название кварцевого резонатора номер %d: ", i + 1);
+	scanf("%s", KR[i].Name);
+	ClearBuffer();
+	printf("Введите Выход: ");
+	scanf("%s", KR[i].Country);
+	ClearBuffer();
+	while(1)
+	{
+		printf("Введите Напряжение: ");
+		while(scanf("%d", &KR[i].Frz) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(KR[i].Frz > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	while(1)
+	{
+		printf("Введите значение максимально допустимой рабочей температуры Tmax: ");
+		while(scanf("%d", &KR[i].Tmax) != 1)
+		{
+			printf("Некорректное значение!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		if(KR[i].Tmax > 0) break;
+		else printf("Вводимое значение должно быть больше 0!\n\n");
+	}
+	printf("Введите Серию в аналогичном корпусе: ");
+	scanf("%s", KR[i].Type);
+	ClearBuffer();
+	Save(FileName, KR, Count);
+	return ;
+}
+				
+				</pre>
+				<br><br><hr>
+				<article id="vstavka"><h2>vstavka.c</h2></article>
+				<pre>
+#include "head.h"
+
+
+
+void vstavka (char* FileName, struct myStruct* KR, int* Count)
+{
+	Open(FileName, KR, Count, 0);
+	int result, i, j;
+	while (1)
+	{
+		printf("Выберите тип сортировки:\n1 - По возрастанию\n2 - По убыванию\n3 - Назад\n");
+		while (scanf("%d", &result) != 1)
+		{
+			printf("Некорректный ввод!\n");
+			ClearBuffer();
+			continue;
+		}
+		ClearBuffer();
+		switch (result)
+		{
+		case 1:
+		{
+			struct myStruct Temp;
+			for (i = 1; i &lt; *Count; i++)
+			{
+				Temp = KR[i];
+				for (j = i - 1; j >= 0 && strcmp(KR[j].Country, Temp.Country) > 0; j--)
+				{
+					KR[j + 1] = KR[j];
+				}
+				KR[j + 1] = Temp;
+			}
+			Save(FileName, KR, Count);
+			break;
+		}
+		case 2:
+		{
+			struct myStruct Temp;
+			for (i = 1; i &lt; *Count; i++)
+			{
+				Temp = KR[i];
+				for (j = i - 1; j >= 0 && strcmp(KR[j].Country, Temp.Country) &lt; 0; j--)
+				{
+					KR[j + 1] = KR[j];
+				}
+				KR[j + 1] = Temp;
+			}
+			Save(FileName, KR, Count);
+			break;
+		}
+		case 3:
+		{
+			return;
+		}
+		}
+	}
+	return;
+}				
+				</pre>
+				<br><br><br><br><br><br><br><br>
+			
+		</div>
+	<aside class="C">
+		<h2>Files</h2>
+		<ul class="projects">
+			  <li><a href="#head">head.h</a></li>
+			  <li><a href="#main">main.c</a></li>
+			  <li><a href="#input">input.c</a></li>
+			  <li><a href="#output">output.c</a></li>
+			  <li><a href="#addend">addend.c</a></li>
+			  <li><a href="#additem">additem.c</a></li>
+			  <li><a href="#delitem">delitem.c</a></li>
+			  <li><a href="#dellend">dellend.c</a></li>
+			  <li><a href="#fastsort">fastsort.c</a></li>
+			  <li><a href="#find">find.c</a></li>
+			  <li><a href="#find1">find1.c</a></li>
+			  <li><a href="#open">open.c</a></li>
+			  <li><a href="#save">save.c</a></li>
+			  <li><a href="#sortbubble">sortbubble.c</a></li>
+			  <li><a href="#sortchoice">sortchoice.c</a></li>
+			  <li><a href="#sortshell">sortshell.c</a></li>
+			  <li><a href="#updateitem">updateitem.c</a></li>
+			  <li><a href="#vstavka">vstavka.c</a></li>
+		</ul>
+	</aside>
+
+
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<footer>
+	   <div class="topnav">
+		 <a href="#part0">UP</a>
+	   </div>
+	</footer>
+
+	</body>
+</html>

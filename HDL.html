@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+	<link rel="stylesheet" href="styles.css" />
+    <title>HDL</title>
+	<meta charset="utf-8" lang/>
+	</head>
+	<body>
+<header>
+	<div class="text3d-wrap-3">
+		<article id="part0"><h1><span>HDL</span></h1></article>
+	</div>
+ </header>
+	
+
+		<div class="section">
+			<hr>
+			<pre>
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+--описание интерфейса объекта
+entity joystick is
+ port(
+ clk : in STD_LOGIC; --тактовый вход
+ rst : in STD_LOGIC; --вход сброса
+ input : in STD_LOGIC_VECTOR(5 downto 0); --входной сигнал автомата
+ output : out STD_LOGIC_VECTOR(7 downto 0) --выходной сигнал автомата
+ );
+end joystick;
+--описание архитектуры объекта
+architecture joystick of joystick is
+--входные состояния автомата
+constant x9 : std_logic_vector (5 downto 0) := "001111"; --входное состояние X9
+constant x10 : std_logic_vector (5 downto 0) := "000110"; --входное состояние X10
+constant x11 : std_logic_vector (5 downto 0) := "001100"; --входное состояние X11
+--выходные состояния автомата
+constant o10 : std_logic_vector (7 downto 0) := "00011100"; --выходное состояние O10
+constant o9 : std_logic_vector (7 downto 0) := "00010100"; --выходное состояние 09
+constant o11 : std_logic_vector (7 downto 0) := "00100011"; --выходное состояние O11
+constant o12 : std_logic_vector (7 downto 0) := "00000000"; --выходное состояние O12
+--перечислимый тип, определяющий внутренние состояния автомата
+type state_type is (
+ a9, --состояние a9
+ a10, --состояние a10
+ a11, --состояние a11
+a12); --состояние a12
+signal state : state_type := a9; -- сигнал, определяющий текущее
+ -- внутренее состояние автомата (начальное состояние a9)
+signal output_i : std_logic_vector (7 downto 0) := o10; -- сигнал, определяющий текущее значение
+ -- выходного сигнала
+begin
+ --процесс запускается при изменении сигналов clk или rst
+ process (clk, rst)
+ begin
+ if (rst = '1') then
+ --если вход сброса активен, установить автомат в начальное состояние (a9/o10)
+ state &lt;= a9;
+ output_i &lt;= o10;
+ elsif (clk'event and clk = '1') then
+ --процесс запущен по приходу переднего фронта тактового импульса
+ --выбор действия по внутреннему состоянию
+ case state is
+ --внутреннее состояние a9
+ when a9 =>
+ --===========================================
+--выбор действия по входному состоянию
+case input is
+ --входное состояние x9
+when x9 =>
+ state &lt;= a9;
+output_i &lt;= o10;
+ --входное состояние x10
+ when x10 =>
+ state &lt;= a12;
+output_i &lt;= o11;
+ --входное состояние x11
+when x11 =>
+ state &lt;= a11;
+ output_i &lt;= o12;
+ --любое другое входное состояние
+when others =>
+ --переход в начальное состояние
+state &lt;= a9;
+output_i &lt;= o10;
+ end case; --input
+ when a10 =>
+ --===========================================
+ --выбор действия по входному состоянию
+case input is
+ --входное состояние x9
+when x9 =>
+ state &lt;= a10;
+output_i &lt;= o9;
+ --входное состояние x10
+when x10 =>
+ state &lt;= a9;
+output_i &lt;= o10;
+ --входное состояние x11
+when x11 =>
+ state &lt;= a12;
+output_i &lt;= o11;
+ --любое другое входное состояние
+when others =>
+ --переход в начальное состояние
+ state &lt;= a9;
+output_i &lt;= o10;
+ end case; --input
+ --===========================================
+ --внутреннее состояние a11
+ when a11 =>
+ --===========================================
+--выбор действия по входному состоянию
+case input is
+ --входное состояние x9
+when x9 =>
+ state &lt;= a11;
+output_i &lt;= o12;
+ --входное состояние x10
+when x10 =>
+ state &lt;= a10;
+output_i &lt;= o9;
+ --входное состояние x11
+when x11 =>
+ state &lt;= a9;
+output_i &lt;= o10;
+ --любое другое входное состояние
+ when others =>
+ --переход в начальное состояние
+state &lt;= a9;
+output_i &lt;= o10;
+ end case; --input
+ --===========================================
+ --внутреннее состояние a12
+ when a12 =>
+ --===========================================
+--выбор действия по входному состоянию
+case input is
+ --входное состояние x9
+when x9 =>
+ state &lt;= a12;
+output_i &lt;= o11;
+ --входное состояние x10
+when x10 =>
+ state &lt;= a11;
+ output_i &lt;= o12;
+ --входное состояние x11
+when x11 =>
+ state &lt;= a10;
+output_i &lt;= o9;
+ --любое другое входное состояние
+when others =>
+ --переход в начальное состояние
+state &lt;= a9;
+ output_i &lt;= o10;
+ end case; --input
+ --===========================================
+ --любое другое внутреннее состояние
+ when others =>
+ --переход в начальное состояние
+state &lt;= a9;
+output_i &lt;= o12;
+ end case; --state
+ --++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ end if; --rst = '1'
+ end process;
+ output &lt;= output_i;
+end joystick;
+
+				</pre>
+				<br><br><br><br><br><br><br><br>
+			
+		</div>
+	<aside class="HDL">
+		
+	</aside>
+
+
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<footer>
+	   <div class="topnav">
+		 <a href="#part0">UP</a>
+	   </div>
+	</footer>
+
+	</body>
+</html>
